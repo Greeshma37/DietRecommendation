@@ -1,0 +1,14 @@
+{
+  "builds":[
+    {
+      "source": "DietRecommendation/diet_api.py",
+      "use": "@vercel/python"
+    }
+  ]
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "DietRecommendation/diet_api.py"
+    }
+  ]
+}
