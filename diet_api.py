@@ -4,7 +4,9 @@ import openai
 import requests
 import re
 import os
+from dotenv import load_dotenv
 
+load_dotenv()
 # Initialize OpenAI API key and endpoint
 openai.api_key = os.environ.get("api_key")  # Replace with your API key
 endpoint = os.environ.get("endpoint")    # Replace with your Azure OpenAI endpoint URL
