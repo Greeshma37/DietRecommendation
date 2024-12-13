@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 # Initialize OpenAI API key and endpoint
 openai.api_key = os.environ.get("api_key")  # Replace with your API key
-endpoint = os.environ.get("endpoint")    # Replace with your Azure OpenAI endpoint URL
+endpoint = "https://gpt4-service.openai.azure.com/"#os.environ.get("endpoint")    # Replace with your Azure OpenAI endpoint URL
 deployment_name = "gpt-4-deployment"#os.environ.get("deployment_name")    # Replace with your deployment name
 
 # Define FastAPI app
