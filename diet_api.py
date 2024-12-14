@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import openai
 import requests
-import re
 import os
 from dotenv import load_dotenv
 
@@ -14,6 +14,15 @@ deployment_name = os.environ.get("deployment_name")    # Replace with your deplo
 
 # Define FastAPI app
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins. Replace with specific origins if needed.
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],  # Allow specific HTTP methods.
+    allow_headers=["Content-Type"],  # Allow specific headers.
+)
 
 # Input JSON structure
 class UserInfo(BaseModel):
@@ -76,12 +85,12 @@ def get_nutrient_and_food_recommendations(user_info):
     )
 
     if response.status_code == 200:
-        response_text = response.json()["choices"][0]["message"]["content"]
+        response_text = response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+        if not response_text:
+            raise HTTPException(status_code=500, detail="Empty response from OpenAI API.")
         return {"recommendations": response_text}
     else:
         raise HTTPException(status_code=500, detail=f"GPT-4 API Error: {response.status_code}, {response.text}")
-
-
 
 
 # Function to translate and summarize the response
@@ -89,7 +98,6 @@ def translate_and_summarize(nutrient_requirements, target_language):
     prompt = f"""
     Translate and summarize the following information into {target_language}:
     {nutrient_requirements}
-
     """
 
     headers = {
@@ -112,7 +120,10 @@ def translate_and_summarize(nutrient_requirements, target_language):
     )
 
     if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"]
+        response_text = response.json().get("choices", [{}])[0].get("message", {}).get("content", "")
+        if not response_text:
+            raise HTTPException(status_code=500, detail="Empty translation response from OpenAI API.")
+        return response_text
     else:
         raise HTTPException(status_code=response.status_code, detail=response.text)
 
